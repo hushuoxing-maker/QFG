@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>古月 · 商业门头设计AI智能体 · 全风格生成器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1a2e;
+            font-family: 'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .generator-card {
+            max-width: 1400px;
+            width: 100%;
+            background: #f5f7fc;
+            border-radius: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c5a 0%, #2a5a7a 100%);
+            padding: 30px 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 36px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #c0e0ff;
+            font-weight: 300;
+        }
+
+        .main {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 30px;
+            gap: 30px;
+        }
+
+        .input-section {
+            flex: 1.2;
+            min-width: 380px;
+            background: white;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .input-section h2 {
+            font-size: 26px;
+            font-weight: 500;
+            color: #1e3c5a;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #ffb85b;
+            padding-bottom: 15px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #2a4a6a;
+            margin-bottom: 8px;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 14px 18px;
+            font-size: 16px;
+            background: #f8faff;
+            border: 2px solid #c0d8f0;
+            border-radius: 40px;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            border-color: #ffb85b;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255,184,91,0.2);
+        }
+
+        .generate-btn {
+            background: linear-gradient(135deg, #1e3c5a 0%, #2a5a7a 100%);
+            border: none;
+            width: 100%;
+            padding: 16px;
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .output-section {
+            flex: 2;
+            background: white;
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .output-header h2 {
+            font-size: 24px;
+            font-weight: 500;
+            color: #1e3c5a;
+        }
+
+        .badge {
+            background: #ffb85b;
+            color: #1e3c5a;
+            padding: 6px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+        }
+
+        .prompts-grid {
+            max-height: 600px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .prompt-item {
+            background: #f8faff;
+            border: 1px solid #e0e8f0;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .prompt-number {
+            font-size: 15px;
+            font-weight: 600;
+            color: #ffb85b;
+            margin-bottom: 8px;
+        }
+
+        .prompt-text {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #2a3a5a;
+            margin-bottom: 15px;
+            padding-right: 80px;
+        }
+
+        .copy-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: #e0ecf5;
+            border: none;
+            border-radius: 30px;
+            padding: 8px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid #c0d8f0;
+        }
+
+        .copy-btn:hover {
+            background: #ffb85b;
+            color: white;
+            border-color: #ffb85b;
+        }
+
+        .footer-note {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #8a9fbf;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <div class="generator-card">
+        <div class="header">
+            <h1>🎨 古月 · 商业门头设计AI智能体</h1>
+            <p>全风格门头提示词生成器 · 20组不重复 · 8K写实 · 100%可施工落地</p>
+        </div>
+
+        <div class="main">
+            <div class="input-section">
+                <h2>🎯 输入门头设计需求</h2>
+                
+                <div class="input-group">
+                    <label>🏪 行业类型</label>
+                    <input type="text" id="industry" value="奶茶店" placeholder="例：奶茶店 / 餐厅 / 服装店">
+                </div>
+
+                <div class="input-group">
+                    <label>🏷️ 品牌店名</label>
+                    <input type="text" id="brand" value="茶颜光年" placeholder="例：茶颜光年">
+                </div>
+
+                <div class="input-group">
+                    <label>📋 主营品类</label>
+                    <input type="text" id="category" value="鲜果奶茶" placeholder="例：鲜果奶茶">
+                </div>
+
+                <div class="input-group">
+                    <label>💬 广告语/标语</label>
+                    <input type="text" id="slogan" value="此刻发光" placeholder="例：此刻发光">
+                </div>
+
+                <div class="input-group">
+                    <label>🎨 选择风格</label>
+                    <select id="styleSelect">
+                        <option value="现代简约">✨ 现代简约 · 极简干净</option>
+                        <option value="新中式">🏮 新中式 · 东方美学</option>
+                        <option value="国潮风">🐉 国潮风 · 潮流醒目</option>
+                        <option value="轻奢风">💎 轻奢风 · 精致高级</option>
+                        <option value="科技风">⚡ 科技风尚 · 未来美学</option>
+                        <option value="INS风">🌸 网红INS风 · 清新治愈</option>
+                        <option value="卡通童趣">🧸 卡通童趣 · 可爱活泼</option>
+                        <option value="赛博朋克">🌃 赛博朋克 · 酷炫潮酷</option>
+                        <option value="泰式东南亚">🌴 泰式东南亚 · 热带异域</option>
+                        <option value="韩式清新">🍦 韩式清新 · 奶油温柔</option>
+                        <option value="欧式复古">🏛️ 欧式复古 · 典雅华丽</option>
+                        <option value="日式原木">🎋 日式原木 · 自然治愈</option>
+                        <option value="中式屋檐">🏯 中式屋檐 · 仿古屋檐</option>
+                        <option value="格栅造型">🌿 格栅造型 · 线条通透</option>
+                        <option value="多层叠加">🏗️ 多层叠加 · 立体感强</option>
+                        <option value="异形创意">🎪 异形创意 · 不规则造型</option>
+                    </select>
+                </div>
+
+                <button class="generate-btn" id="generateBtn">✨ 生成 20 组门头提示词 ✨</button>
+            </div>
+
+            <div class="output-section">
+                <div class="output-header">
+                    <h2>20组正立面门头效果图</h2>
+                    <span class="badge" id="countDisplay">0 / 20</span>
+                </div>
+                <div class="prompts-grid" id="promptsList">
+                    <!-- 提示词将动态生成到这里 -->
+                </div>
+                <div class="footer-note">
+                    ⚡ 每组均为完整描述 · 白天正立面 · 8K写实 · 可直接复制用于即梦AI
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const industryInput = document.getElementById('industry');
+            const brandInput = document.getElementById('brand');
+            const categoryInput = document.getElementById('category');
+            const sloganInput = document.getElementById('slogan');
+            const styleSelect = document.getElementById('styleSelect');
+            const generateBtn = document.getElementById('generateBtn');
+            const promptsListDiv = document.getElementById('promptsList');
+            const countDisplay = document.getElementById('countDisplay');
+
+            const styleConfig = {
+                '现代简约': {
+                    materials: ['白色烤漆板', '浅灰色铝塑板', '米白色烤漆板', '高级灰烤漆板', '象牙白烤漆板', '银灰色铝板', '哑光白烤漆板', '浅灰白色铝塑板'],
+                    decors: ['不锈钢收边', '极简线条灯', '无边框设计', '线性灯光带', '金属包边', '嵌入式灯带', '无缝拼接', '隐形边框'],
+                    lights: ['清晰背光字', '柔和正面光', '极简线条灯', '嵌入式灯带', '均匀发光', '背光均匀', '柔和光效', '线性灯光'],
+                    colors: ['白色', '浅灰', '米白', '深灰', '高级灰', '银灰', '象牙白', '霜白']
+                },
+                '新中式': {
+                    materials: ['深色实木格栅', '浅色木纹铝板', '防腐木实木条', '深色木饰面', '木纹铝板', '柚木实木', '胡桃木', '竹木纤维板'],
+                    decors: ['中式格栅', '石材基底', '中式檐口', '窗棂元素', '金属包边', '木雕花', '石材门套', '铜质装饰'],
+                    lights: ['暖光洗墙灯', '暖色氛围灯', '背光字暖光', '嵌入式洗墙灯', '暖光射灯', '暖色灯带', '背光暖光', '洗墙灯带'],
+                    colors: ['深木色', '米白', '深灰', '原木色', '黛色', '赭石', '茶色', '檀棕']
+                },
+                '国潮风': {
+                    materials: ['中国红烤漆板', '朱砂红烤漆板', '帝王黄烤漆板', '明黄色烤漆板', '赤金色烤漆板', '枣红色烤漆板', '胭脂红烤漆板', '宝蓝色烤漆板'],
+                    decors: ['祥云图案装饰', '龙纹图案', '霓虹灯带', '拉丝不锈钢', '钛金收边', '金色线条', '传统纹样', '彩色灯带'],
+                    lights: ['霓虹灯带', '强光发光字', '氛围灯', '彩色霓虹', '高亮灯带', 'RGB灯光', '炫彩光效', '霓虹渐变'],
+                    colors: ['中国红', '帝王黄', '赤金', '朱砂红', '宝蓝', '墨绿', '绛紫', '赤红']
+                },
+                '轻奢风': {
+                    materials: ['爵士白大理石', '卡拉拉白大理石', '意大利灰大理石', '云多拉灰大理石', '宝格丽棕大理石', '鱼肚白大理石', '雪花白大理石', '深啡网大理石'],
+                    decors: ['玫瑰金金属线条', '香槟金金属线条', '拉丝不锈钢', '镜面不锈钢', '黑钛金属', '古铜金属', '钛金线条', '金属嵌条'],
+                    lights: ['暗藏氛围灯', '背光字', '线条灯', '嵌入式射灯', '金属灯槽', '氛围光带', '背光效果', '柔和背光'],
+                    colors: ['爵士白', '香槟金', '玫瑰金', '深灰', '黑钛', '古铜', '象牙白', '浅咖']
+                },
+                '科技风': {
+                    materials: ['拉丝不锈钢', '哑光黑钛金', '穿孔铝板', '炫彩渐变玻璃', 'LED光电玻璃', '透光混凝土', '镜面金属板', '铝单板'],
+                    decors: ['嵌入式线性灯带', '几何切割造型', '镜面金属板', '铝单板', '透光混凝土', '穿孔板', '渐变玻璃', '金属格栅'],
+                    lights: ['科技蓝光', '呼吸灯效果', '背光发光字', '冷白光', '线性灯光', 'RGB氛围', '动态光影', '冷光效果'],
+                    colors: ['银灰', '黑钛', '科技蓝', '炫彩', '太空灰', '深空蓝', '钛银色', '碳灰']
+                },
+                'INS风': {
+                    materials: ['樱花粉烤漆板', '薄荷绿烤漆板', '香芋紫烤漆板', '奶油黄烤漆板', '雾霾蓝烤漆板', '豆沙红烤漆板', '藕粉色烤漆板', '蜜桃粉烤漆板'],
+                    decors: ['绿植装饰', '霓虹灯带', '软膜灯箱', '亚克力透明橱窗', 'ins风相框', '网格架', '照片墙', '小彩灯'],
+                    lights: ['霓虹灯', '柔和发光字', '氛围灯', '暖色灯带', '少女感灯光', '彩灯串', '柔光氛围', '温馨光效'],
+                    colors: ['樱花粉', '薄荷绿', '香芋紫', '奶油黄', '雾霾蓝', '豆沙红', '藕粉色', '蜜桃粉']
+                },
+                '卡通童趣': {
+                    materials: ['彩虹色烤漆板', '糖果色烤漆板', '马卡龙粉', '马卡龙蓝', '马卡龙黄', '果绿色', '亮橙色', '天蓝色'],
+                    decors: ['小熊IP造型', '小兔IP造型', '卡通立体字', '圆润包边', '软膜灯箱', '卡通雕塑', '气球装饰', '彩虹拱门'],
+                    lights: ['卡通造型灯', '彩色发光字', '柔光氛围', '软膜均匀光', '可爱灯饰', '星星灯', '彩色光效', '柔和背光'],
+                    colors: ['彩虹色', '糖果色', '马卡龙色', '亮黄', '粉红', '果绿', '天蓝', '橙色']
+                },
+                '赛博朋克': {
+                    materials: ['深灰色金属板', '黑色金属板', '紫色渐变金属', '蓝色金属板', '炭黑色板', '炫彩金属', '霓虹板', '镜面黑'],
+                    decors: ['霓虹灯管', '渐变灯箱', '拉丝不锈钢', 'LED屏', '机械造型', '电路板纹', '网格', '故障艺术'],
+                    lights: ['霓虹渐变', '强发光字', '外发光', '紫色光', '蓝色光', 'RGB动态', '霓虹闪烁', '冷艳光'],
+                    colors: ['深灰', '紫', '蓝', '黑', '霓虹彩', '粉紫', '电光蓝', '荧光绿']
+                },
+                '泰式东南亚': {
+                    materials: ['深色实木雕花', '柚木实木', '老榆木', '藤编板', '金色装饰板', '红木', '竹编', '彩色玻璃'],
+                    decors: ['芭蕉叶元素', '泰式灯箱', '木雕', '彩色玻璃', '热带花纹', '大象雕塑', '金色装饰', '藤编灯'],
+                    lights: ['暖黄灯笼', '氛围灯', '金色光', '柔光', '暖色背光', '纸灯', '暖光洗墙', '温馨光'],
+                    colors: ['柚木色', '金色', '红色', '绿色', '暖黄', '棕红', '草绿', '橙黄']
+                },
+                '韩式清新': {
+                    materials: ['奶油色烤漆板', '燕麦色烤漆板', '米白色烤漆板', '浅杏色烤漆板', '奶咖色烤漆板', '浅米色', '香草色', '杏仁色'],
+                    decors: ['木纹板', '无边框字', '软膜灯箱', '亚克力', '极简线条', '原木条', '磨砂玻璃', '简约框'],
+                    lights: ['柔和正面光', '背光字', '暖白光', '均匀光', '无眩光', '柔光板', '背光柔和', '温馨光'],
+                    colors: ['奶油色', '燕麦色', '米白', '浅杏', '奶咖', '香草色', '杏仁色', '浅米']
+                },
+                '欧式复古': {
+                    materials: ['米黄色复古漆', '奶白色复古漆', '浅咖色复古漆', '象牙白复古漆', '香槟色复古漆', '暖灰色', '米色', '浅棕色'],
+                    decors: ['欧式雕花板', '石膏线条', '罗马柱', '石材包边', '复古壁灯', '铁艺花', '铜质灯', '古典纹'],
+                    lights: ['复古灯', '暖黄氛围灯', '壁灯', '柔光', '金色光', '烛光感', '暖光洗墙', '古典光'],
+                    colors: ['米黄', '奶白', '香槟', '浅咖', '象牙白', '暖灰', '米色', '浅棕']
+                },
+                '日式原木': {
+                    materials: ['浅色实木', '原木色实木', '橡木实木', '白蜡木', '枫木', '杉木', '松木', '竹木'],
+                    decors: ['日式格栅', '竹编', '磨砂玻璃', '和纸灯', '木质字', '障子纸', '石灯笼', '枯山水'],
+                    lights: ['暖光', '日式小灯', '柔和背光', '纸灯柔光', '木质氛围', '暖色洗墙', '朦胧光', '温馨光'],
+                    colors: ['原木色', '米白', '浅棕', '竹色', '暖白', '亚麻', '浅驼', '米色']
+                },
+                '中式屋檐': {
+                    materials: ['仿古青瓦', '灰色筒瓦', '琉璃瓦', '黛瓦', '实木', '青砖', '石材', '铜瓦'],
+                    decors: ['实木立柱', '石材基座', '牌匾字', '中式格栅', '金属檐口', '斗拱', '雀替', '挂落'],
+                    lights: ['洗墙灯', '檐口氛围灯', '暖光', '壁灯', '灯笼', '瓦面光', '立柱光', '暖色洗墙'],
+                    colors: ['青灰', '深木色', '黛色', '米白', '赭石', '灰瓦', '砖红', '铜色']
+                },
+                '格栅造型': {
+                    materials: ['深色木格栅', '浅色木格栅', '黑色金属格栅', '深灰色金属格栅', '香槟金金属格栅', '柚木格栅', '胡桃木格栅', '拉丝金属格栅'],
+                    decors: ['竖向排列', '横向排列', '错落排列', '金属线条', '背光设计', '格栅灯', '透空格栅', '疏密变化'],
+                    lights: ['格栅背光', '线性灯带', '洗墙灯', '暖色氛围', '冷白光', '格栅透光', '背光朦胧', '线条光'],
+                    colors: ['木色', '黑', '深灰', '香槟金', '银灰', '柚木色', '胡桃色', '拉丝银']
+                },
+                '多层叠加': {
+                    materials: ['红色烤漆板', '黑色烤漆板', '银色烤漆板', '金色烤漆板', '蓝色烤漆板', '橙色板', '紫色板', '绿色板'],
+                    decors: ['铁艺框架', '霓虹灯带', '金属造型', '错落灯箱', 'IP造型', '层叠板', '立体构成', '穿插结构'],
+                    lights: ['多层灯光', '霓虹灯带', '氛围灯', '彩色光', '发光字', '层叠光', '立体光效', '霓虹层次'],
+                    colors: ['红', '黑', '银', '金', '蓝', '橙', '紫', '绿']
+                },
+                '异形创意': {
+                    materials: ['玻璃钢', '异形烤漆', '软膜灯箱', 'IP造型', '彩色亚克力', '树脂', '硅胶', '复合材质'],
+                    decors: ['IP雕塑', '铁艺造型', '发光字', '不规则造型', '网红元素', '抽象形态', '艺术造型', '互动装置'],
+                    lights: ['造型灯', '氛围灯', '彩色霓虹', '软膜光', '轮廓灯', '内发光', '外发光', '渐变光'],
+                    colors: ['粉', '蓝', '黄', '绿', '彩', '渐变色', '糖果色', '荧光色']
+                }
+            };
+
+            function generatePrompts(industry, brand, category, slogan, style) {
+                const config = styleConfig[style] || styleConfig['现代简约'];
+                const prompts = [];
+                
+                for (let i = 0; i < 20; i++) {
+                    const material = config.materials[i % config.materials.length];
+                    const decor = config.decors[i % config.decors.length];
+                    const light = config.lights[i % config.lights.length];
+                    const color = config.colors[i % config.colors.length];
+                    
+                    const prompt = `白天自然光下，某${industry}门头正立面完整展示，正面平视视角，无透视畸变无遮挡。门头为${style}风格，采用${material}为基底，${decor}装饰，整体${color}色调，${light}照明。品牌店名“${brand}”搭配主营品类“${category}”及标语“${slogan}”，醒目清晰字体。8K高清商业写实效果图，细节丰富色彩自然，可直接施工参考。门头效果图正面完全展示。`;
+                    
+                    prompts.push(prompt);
+                }
+                
+                return prompts;
+            }
+
+            function renderPrompts(prompts) {
+                let html = '';
+                prompts.forEach((prompt, idx) => {
+                    const escapedPrompt = prompt.replace(/"/g, '&quot;');
+                    html += `
+                        <div class="prompt-item">
+                            <div class="prompt-number">✨ 第 ${idx+1} 组 · 正立面门头</div>
+                            <div class="prompt-text">${prompt}</div>
+                            <button class="copy-btn" onclick="copyPrompt('${escapedPrompt}', this)">📋 复制</button>
+                        </div>
+                    `;
+                });
+                
+                promptsListDiv.innerHTML = html;
+                countDisplay.innerText = `${prompts.length} / 20`;
+            }
+
+            window.copyPrompt = function(prompt, btn) {
+                navigator.clipboard.writeText(prompt).then(() => {
+                    btn.textContent = '✓ 已复制';
+                    setTimeout(() => {
+                        btn.textContent = '📋 复制';
+                    }, 2000);
+                }).catch(() => {
+                    alert('复制失败');
+                });
+            };
+
+            generateBtn.addEventListener('click', () => {
+                const industry = industryInput.value.trim();
+                const brand = brandInput.value.trim();
+                const category = categoryInput.value.trim();
+                const slogan = sloganInput.value.trim();
+                const style = styleSelect.value;
+                
+                if (!industry || !brand || !category || !slogan) {
+                    alert('请完整填写所有信息');
+                    return;
+                }
+                
+                const prompts = generatePrompts(industry, brand, category, slogan, style);
+                renderPrompts(prompts);
+            });
+
+            // 默认生成一组示例
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    const prompts = generatePrompts('奶茶店', '茶颜光年', '鲜果奶茶', '此刻发光', '现代简约');
+                    renderPrompts(prompts);
+                }, 100);
+            });
+        })();
+    </script>
+</body>
+</html>
