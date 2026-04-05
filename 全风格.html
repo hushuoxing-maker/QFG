@@ -2,221 +2,207 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>古月AI智能体 · 商业门头（强随机终极版）</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>古月 · 商业门头设计AI智能体 · 全风格生成器</title>
 
 <style>
+*{margin:0;padding:0;box-sizing:border-box;}
 body{
-  background:#1a1a2e;
-  font-family:"Microsoft YaHei";
-  padding:30px;
+background:#1a1a2e;
+font-family:'Microsoft YaHei','PingFang SC','Helvetica Neue',sans-serif;
+display:flex;justify-content:center;align-items:center;
+min-height:100vh;padding:20px;
 }
-.box{
-  max-width:1200px;
-  margin:auto;
-  background:#fff;
-  border-radius:20px;
-  padding:30px;
+.generator-card{
+max-width:1400px;width:100%;
+background:#f5f7fc;border-radius:40px;
+box-shadow:0 20px 40px rgba(0,0,0,0.2);
+overflow:hidden;
 }
-input,select{
-  width:100%;
-  padding:12px;
-  margin-bottom:10px;
-  border-radius:10px;
-  border:1px solid #ddd;
+.header{
+background:linear-gradient(135deg,#1e3c5a 0%,#2a5a7a 100%);
+padding:30px 40px;color:white;
 }
-button{
-  width:100%;
-  padding:14px;
-  background:#2a5a7a;
-  color:#fff;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
+.header h1{font-size:36px;margin-bottom:8px;}
+.header p{font-size:18px;color:#c0e0ff;}
+.main{display:flex;flex-wrap:wrap;padding:30px;gap:30px;}
+.input-section,.output-section{
+background:white;padding:30px;border-radius:30px;
+box-shadow:0 10px 20px rgba(0,0,0,0.05);
 }
-.item{
-  background:#f5f7fc;
-  padding:15px;
-  margin-top:10px;
-  border-radius:10px;
-  position:relative;
+.input-section{flex:1.2;min-width:380px;}
+.output-section{flex:2;}
+
+.input-group{margin-bottom:20px;}
+.input-group label{display:block;margin-bottom:8px;font-weight:600;}
+.input-group input,.input-group select{
+width:100%;padding:14px;border-radius:40px;
+border:2px solid #c0d8f0;background:#f8faff;
 }
-.copy{
-  position:absolute;
-  right:10px;
-  bottom:10px;
+.generate-btn{
+width:100%;padding:16px;font-size:20px;
+border:none;border-radius:60px;
+background:linear-gradient(135deg,#1e3c5a,#2a5a7a);
+color:white;cursor:pointer;
+}
+
+.prompts-grid{max-height:600px;overflow-y:auto;}
+.prompt-item{
+background:#f8faff;border:1px solid #e0e8f0;
+border-radius:24px;padding:20px;margin-bottom:15px;
+position:relative;
+}
+.copy-btn{
+position:absolute;right:20px;bottom:20px;
+border:none;padding:8px 20px;border-radius:30px;
+cursor:pointer;background:#e0ecf5;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
+<div class="generator-card">
 
-<h2>古月AI智能体 · 商业门头（强随机终极版）</h2>
+<div class="header">
+<h1>🎨 古月 · 商业门头设计AI智能体</h1>
+<p>全风格门头提示词生成器 · 20组不重复 · 8K写实</p>
+</div>
 
-<input id="industry" placeholder="行业">
-<input id="brand" placeholder="品牌">
-<input id="category" placeholder="品类">
-<input id="slogan" placeholder="标语">
+<div class="main">
 
-<select id="style">
-<option>现代简约</option>
-<option>轻奢风</option>
-<option>国潮风</option>
-<option>科技风</option>
+<div class="input-section">
+<div class="input-group">
+<label>行业</label>
+<input id="industry" value="奶茶店">
+</div>
+
+<div class="input-group">
+<label>品牌</label>
+<input id="brand" value="茶颜光年">
+</div>
+
+<div class="input-group">
+<label>品类</label>
+<input id="category" value="鲜果奶茶">
+</div>
+
+<div class="input-group">
+<label>标语</label>
+<input id="slogan" value="此刻发光">
+</div>
+
+<div class="input-group">
+<label>风格</label>
+<select id="styleSelect">
+<option value="现代简约">现代简约</option>
+<option value="轻奢风">轻奢风</option>
+<option value="国潮风">国潮风</option>
 </select>
+</div>
 
-<button onclick="run()">生成20组</button>
+<button class="generate-btn" id="generateBtn">生成20组</button>
+</div>
 
-<div id="list"></div>
+<div class="output-section">
+<div id="promptsList" class="prompts-grid"></div>
+</div>
 
+</div>
 </div>
 
 <script>
 
-// ===== 随机 =====
-function rand(arr){
-  return arr[Math.floor(Math.random()*arr.length)]
-}
+(function(){
 
-// ===== 防重复 =====
-let last = {}
-function randNoRepeat(key, arr){
-  let val
-  do{
-    val = rand(arr)
-  }while(val === last[key])
-  last[key] = val
-  return val
-}
-
-// ===== 打乱 =====
-function shuffle(arr){
-  return arr.sort(()=>Math.random()-0.5)
-}
-
-// ===== 风格库 =====
-const styleMap = {
-"现代简约":{
-materials:["白色铝板","灰色铝塑板","哑光板","极简金属"],
-decors:["线性灯","无边框","隐藏灯带","极简线条"],
-lights:["柔光","自然光","均匀光","干净光"],
-colors:["白","灰","米白","极简灰"]
+const styleConfig = {
+'现代简约':{
+materials:['白色烤漆板','浅灰铝板','象牙白','高级灰'],
+decors:['金属包边','线性灯带','无边框','嵌入灯'],
+lights:['背光字','柔光','均匀光','线性光'],
+colors:['白','灰','米白','银灰']
 },
-"轻奢风":{
-materials:["大理石","玫瑰金不锈钢","香槟金","镜面金属"],
-decors:["金属线条","包边","嵌条","金属装饰"],
-lights:["氛围灯","背光","柔光","高级光"],
-colors:["金","白","灰","黑"]
+'轻奢风':{
+materials:['大理石','黑钛金','香槟金'],
+decors:['金属线条','镜面','嵌条'],
+lights:['氛围灯','背光','射灯'],
+colors:['白','金','灰']
 },
-"国潮风":{
-materials:["红色板","中国红","金色板","木板"],
-decors:["祥云","霓虹","金边","传统纹样"],
-lights:["霓虹","强光","彩光","RGB"],
-colors:["红","金","黄","蓝"]
-},
-"科技风":{
-materials:["金属板","黑钛","玻璃","铝板"],
-decors:["线性灯","切割","几何","金属格栅"],
-lights:["蓝光","冷光","RGB","科技光"],
-colors:["黑","蓝","灰","银"]
+'国潮风':{
+materials:['红色烤漆','金色板','蓝色板'],
+decors:['祥云','霓虹','金属'],
+lights:['霓虹','强光','彩光'],
+colors:['红','金','蓝']
+}
+};
+
+function random(arr){
+return arr[Math.floor(Math.random()*arr.length)];
+}
+
+function generatePrompts(industry, brand, category, slogan, style){
+
+const config = styleConfig[style];
+const prompts = [];
+const used = new Set();
+
+while(prompts.length < 20){
+
+const material = random(config.materials);
+const decor = random(config.decors);
+const light = random(config.lights);
+const color = random(config.colors);
+
+const structure = random(['单层结构','双层结构','立体结构','外扩结构','内凹结构']);
+const layout = random(['居中','左右分布','上下结构','极简排版']);
+const detail = random(['高级感强','视觉冲击','商业感强','层次丰富']);
+
+const prompt = `白天，${industry}门头正立面，${style}风格，${material}+${decor}，${structure}，${color}色调，${light}照明，排版${layout}，品牌“${brand}”，品类“${category}”，标语“${slogan}”，${detail}，8K写实，可施工`;
+
+if(!used.has(prompt)){
+used.add(prompt);
+prompts.push(prompt);
 }
 }
 
-// ===== 模板 =====
-const templates = [
-
-(c)=>`白天自然光，${c.industry}门头正立面，${c.material}主体，${c.decor}设计，${c.color}色调，${c.light}光效，品牌“${c.brand}”，${c.category}，${c.slogan}，8K写实`,
-
-(c)=>`${c.style}风格${c.industry}门头，采用${c.material}，结合${c.decor}，整体${c.color}体系，搭配${c.light}照明，品牌“${c.brand}”突出，商业效果图`,
-
-(c)=>`围绕${c.brand}打造${c.industry}门头，${c.style}风格，${c.material}基底，${c.decor}强化，${c.color}氛围，${c.light}灯光，真实落地`,
-
-// 🔥 完全打乱结构
-(c)=>{
-  let arr = shuffle([
-    `${c.industry}门头`,
-    `${c.style}风格`,
-    `${c.material}`,
-    `${c.decor}`,
-    `${c.color}`,
-    `${c.light}`,
-    `品牌${c.brand}`,
-    `${c.category}`,
-    `${c.slogan}`,
-    `8K写实`
-  ])
-  return arr.join("，")
+return prompts;
 }
 
-]
+function render(prompts){
 
-// ===== 单条 =====
-function genOne(industry,brand,category,slogan,style){
+let html = '';
 
-  let conf = styleMap[style]
+prompts.forEach((p,i)=>{
+const safe = p.replace(/"/g,'&quot;');
+html += `
+<div class="prompt-item">
+<div>${i+1}. ${p}</div>
+<button class="copy-btn" onclick="copyPrompt('${safe}',this)">复制</button>
+</div>`;
+});
 
-  let c = {
-    industry,
-    brand,
-    category,
-    slogan,
-    style,
-    material:randNoRepeat("m",conf.materials),
-    decor:randNoRepeat("d",conf.decors),
-    light:randNoRepeat("l",conf.lights),
-    color:randNoRepeat("c",conf.colors)
-  }
-
-  return rand(templates)(c)
+document.getElementById('promptsList').innerHTML = html;
 }
 
-// ===== 生成20条（去重）=====
-function genAll(industry,brand,category,slogan,style){
+window.copyPrompt = function(text,btn){
+navigator.clipboard.writeText(text);
+btn.innerText='已复制';
+setTimeout(()=>btn.innerText='复制',1500);
+};
 
-  let set = new Set()
-  let safe = 200
+document.getElementById('generateBtn').onclick = ()=>{
 
-  while(set.size < 20 && safe--){
-    let txt = genOne(industry,brand,category,slogan,style)
+const industry = document.getElementById('industry').value;
+const brand = document.getElementById('brand').value;
+const category = document.getElementById('category').value;
+const slogan = document.getElementById('slogan').value;
+const style = document.getElementById('styleSelect').value;
 
-    // 二次扰动（彻底去重复）
-    txt += " ·"+Math.floor(Math.random()*9999)
+const prompts = generatePrompts(industry,brand,category,slogan,style);
+render(prompts);
+};
 
-    set.add(txt)
-  }
-
-  return Array.from(set)
-}
-
-// ===== 主函数 =====
-function run(){
-
-  let industry=document.getElementById("industry").value
-  let brand=document.getElementById("brand").value
-  let category=document.getElementById("category").value
-  let slogan=document.getElementById("slogan").value
-  let style=document.getElementById("style").value
-
-  let list = genAll(industry,brand,category,slogan,style)
-
-  let html=""
-
-  list.forEach((t,i)=>{
-    html+=`
-    <div class="item">
-    ${i+1}. ${t}
-    <button class="copy" onclick="copy('${t.replace(/'/g,"")}')">复制</button>
-    </div>`
-  })
-
-  document.getElementById("list").innerHTML=html
-}
-
-// ===== 复制 =====
-function copy(t){
-  navigator.clipboard.writeText(t)
-}
+})();
 
 </script>
 
